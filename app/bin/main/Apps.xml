@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<apps>
+    <app onToolbar="0">
+        <name>Run A Jar</name>
+        <image>/image/RunAJar.svg</image>
+        <class>operatedarocket.apps.RunAJar.RunAJarApplication</class>
+    </app>
+    <app onToolbar="1">
+        <name>Flower Mail</name>
+        <image>/image/FlowerMail.svg</image>
+        <class>operatedarocket.apps.FlowerMail.FlowerMailApplication</class>
+    </app>
+    <app onToolbar="1">
+        <name>Help</name>
+        <image>/image/Help.svg</image>
+        <class>operatedarocket.apps.help.Help</class>
+    </app>
+    <app onToolbar="0">
+        <name>LocalHost Browser</name>
+        <image>/image/Apps/LocalhostBrowser.svg</image>
+        <class>operatedarocket.apps.HTMLEngine.HTMLEngineApp</class>
+    </app>
+</apps>

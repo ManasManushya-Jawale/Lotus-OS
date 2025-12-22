@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <apps>
     <app onToolbar="0">
-        <name>Jar Runner</name>
-        <image>/image/JaRunner.svg</image>
+        <name>Run A Jar</name>
+        <image>/image/RunAJar.svg</image>
         <class>operatedarocket.apps.RunAJar.RunAJarApplication</class>
     </app>
     <app onToolbar="1">
@@ -14,5 +14,15 @@
         <name>Help</name>
         <image>/image/Help.svg</image>
         <class>operatedarocket.apps.help.Help</class>
+    </app>
+    <app onToolbar="0">
+        <name>LocalHost Browser</name>
+        <image>/image/Apps/LocalhostBrowser.svg</image>
+        <class>operatedarocket.apps.HTMLEngine.HTMLEngineApp</class>
+    </app>
+    <app onToolbar="1">
+        <name>File Manager</name>
+        <image>/image/Apps/FileManager.svg</image>
+        <class>operatedarocket.apps.FileManager.FileManagerApp</class>
     </app>
 </apps>

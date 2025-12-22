@@ -62,15 +62,33 @@ public class FlowerMailBackend {
         String sender = info[3];
         String title = info[4];
 
+        ArrayList<Mail.Hyprlink> hyprlinks = new ArrayList<>();
+
         StringBuilder bodyBuilder = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
             if (bodyBuilder.length() > 0) bodyBuilder.append('\n');
+            if (line.startsWith(":link:")) {
+                String[] linkInfo = line.split(":");
+                hyprlinks.add(new Mail.Hyprlink(
+                        linkInfo[2],
+                        linkInfo[3]
+                ));
+                continue;
+            }
             bodyBuilder.append(line);
         }
 
         LocalDate date = LocalDate.of(yr, mt, dy);
-        mails.add(new Mail(sender, title, date, bodyBuilder.toString()){{send=true;}});
+        mails.add(new Mail(
+                sender,
+                title,
+                date,
+                bodyBuilder.toString(),
+                hyprlinks.toArray(new Mail.Hyprlink[0]))
+        {{
+            send=true;
+        }});
     }
 
 }

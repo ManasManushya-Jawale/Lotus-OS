@@ -1,5 +1,6 @@
 package operatedarocket.apps.RunAJar;
 
+import net.miginfocom.swing.MigLayout;
 import operatedarocket.ui.AppFrame;
 import operatedarocket.util.LocalFonts;
 
@@ -13,15 +14,15 @@ public class RunAJarApplication extends AppFrame {
     public JLabel titleText;
     public JButton runAJar;
 
-    public RunAJarApplication(String title) {
-        super(title);
+    public RunAJarApplication(String title, String imagePath) {
+        super(title, imagePath);
 
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setLayout(new MigLayout());
 
         titleText = new JLabel(title);
         titleText.setFont(LocalFonts.INTER.deriveFont(Font.BOLD, 50));
         titleText.setAlignmentX(Component.CENTER_ALIGNMENT);
-        addContent(titleText);
+        addContent(titleText, "grow");
 
         runAJar = new JButton(new AbstractAction("Run A Jar") {
             @Override
@@ -30,7 +31,7 @@ public class RunAJarApplication extends AppFrame {
             }
         });
         runAJar.setAlignmentX(Component.CENTER_ALIGNMENT);
-        addContent(runAJar);
+        addContent(runAJar, "grow");
     }
 
     public void runAJar() {

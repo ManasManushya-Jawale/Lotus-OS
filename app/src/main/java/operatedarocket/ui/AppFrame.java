@@ -1,11 +1,13 @@
 package operatedarocket.ui;
 
+import operatedarocket.OperateDaRocketApplication;
+import operatedarocket.Utilities;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.RoundRectangle2D;
 
-public class AppFrame extends JFrame {
+public class AppFrame extends JPanel {
 
     private final JPanel topBar;
     public final JPanel content;
@@ -13,29 +15,54 @@ public class AppFrame extends JFrame {
     private final JButton maximize;
     private final JButton minimize;
 
-    private final JPanel topResizer, bottomResizer, leftResizer, rightResizer;
-
     private boolean maximized = false;
-    private static final int RADIUS = 15;
     private Point initialClick;
 
-    public AppFrame(String title) {
-        super(title);
+    // Default restore size
+    private Rectangle restoreBounds = new Rectangle(100, 100, 900, 600);
 
-        setUndecorated(true);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(900, 600);
-        setLocationRelativeTo(null);
+    // Custom maximize margins
+    private final int maxX = 0;
+    private final int maxY = 0;
+    private final int maxMarginRight = 0;
+    private final int maxMarginBottom = 0;
+
+    public AppFrame(String title, String imageResourcePath) {
+
         setLayout(new BorderLayout());
+        setOpaque(true);
+        setBackground(UIManager.getColor("Panel.background"));
+        setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+        setBounds(restoreBounds);
+        setDoubleBuffered(true);
 
         // Top bar
         topBar = new JPanel(new BorderLayout());
-        topBar.setBackground(new Color(50, 50, 50));
+        topBar.setBackground(UIManager.getColor("Panel.background").darker());
+        topBar.setPreferredSize(new Dimension(0, 36));
 
         JLabel titleLabel = new JLabel(title);
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
-        topBar.add(titleLabel, BorderLayout.WEST);
+
+        setName(title);
+
+        JLabel icon;
+        try {
+            icon = new JLabel(
+                    new ImageIcon(Utilities.getScaledImageToFill(
+                            Utilities.SVGtoBufferedImage(
+                                    OperateDaRocketApplication.class.getResourceAsStream(imageResourcePath)),
+                            28, 28))
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
+        left.setOpaque(false);
+        left.add(icon);
+        left.add(titleLabel);
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 4));
         controls.setOpaque(false);
@@ -47,148 +74,34 @@ public class AppFrame extends JFrame {
         controls.add(minimize);
         controls.add(maximize);
         controls.add(close);
+
+        topBar.add(left, BorderLayout.WEST);
         topBar.add(controls, BorderLayout.EAST);
 
-        // Content area
+        add(topBar, BorderLayout.NORTH);
+
+        // Content panel
         content = new JPanel(new BorderLayout());
+        content.setDoubleBuffered(true);
         add(content, BorderLayout.CENTER);
 
-        // Button actions
-        close.addActionListener(e -> dispose());
-        maximize.addActionListener(e -> onMaximize());
-        minimize.addActionListener(e -> setState(JFrame.ICONIFIED));
-
-        // Rounded corners update on resize
-        addComponentListener(new ComponentAdapter() {
-            @Override public void componentResized(ComponentEvent e) {
-                if (!maximized) applyRoundedShape();
+        // Close
+        close.addActionListener(e -> {
+            Container parent = getParent();
+            if (parent != null) {
+                parent.remove(this);
+                parent.repaint();
             }
         });
 
-        // Dragging logic
-        topBar.addMouseListener(new MouseAdapter() {
-            @Override public void mousePressed(MouseEvent e) {
-                if (maximized) {
-                    onMaximize();
-                    try {
-                        Robot robot = new Robot();
-                        robot.mouseMove(topBar.getX(), topBar.getY());
-                    } catch (AWTException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-                initialClick = e.getPoint();
-            }
-            @Override public void mouseReleased(MouseEvent e) {
-                initialClick = null;
-            }
-        });
-        topBar.addMouseMotionListener(new MouseAdapter() {
-            @Override public void mouseDragged(MouseEvent e) {
-                if (initialClick != null && !maximized) {
-                    int thisX = getLocation().x;
-                    int thisY = getLocation().y;
-                    int xMoved = e.getX() - initialClick.x;
-                    int yMoved = e.getY() - initialClick.y;
-                    setLocation(thisX + xMoved, thisY + yMoved);
-                }
-            }
-        });
+        // Minimize
+        minimize.addActionListener(e -> setVisible(false));
 
-        bottomResizer = new JPanel();
-        rightResizer = new JPanel();
-        leftResizer = new JPanel();
-        topResizer = new JPanel();
+        // Maximize
+        maximize.addActionListener(e -> toggleMaximize());
 
-        topResizer.setBackground(new Color(50, 50, 50));
-        int RESIZE_MARGIN = 6;
-
-        topResizer.setPreferredSize(new Dimension(0, RESIZE_MARGIN));
-        leftResizer.setPreferredSize(new Dimension(RESIZE_MARGIN, 0));
-        rightResizer.setPreferredSize(new Dimension(RESIZE_MARGIN, 0));
-        bottomResizer.setPreferredSize(new Dimension(0, RESIZE_MARGIN));
-
-        topResizer.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                Rectangle bounds = getBounds();
-                int dy = e.getYOnScreen();
-                int newH = bounds.height + bounds.y - dy;
-                if (newH > getMinimumSize().height) {
-                    bounds.height = newH;
-                    bounds.y = dy;
-                    setBounds(bounds);
-                    applyRoundedShape();
-                }
-            }
-        });
-
-        bottomResizer.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                Rectangle bounds = getBounds();
-                int dy = e.getYOnScreen();
-                int newH = dy - bounds.y;
-                if (newH > getMinimumSize().height) {
-                    bounds.height = newH;
-                    setBounds(bounds);
-                    applyRoundedShape();
-                }
-            }
-        });
-
-        leftResizer.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                Rectangle bounds = getBounds();
-                int dx = e.getXOnScreen();
-                int newW = bounds.width + bounds.x - dx;
-                if (newW > getMinimumSize().width) {
-                    bounds.width = newW;
-                    bounds.x = dx;
-                    setBounds(bounds);
-                    applyRoundedShape();
-                }
-            }
-        });
-
-        rightResizer.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                Rectangle bounds = getBounds();
-                int dx = e.getXOnScreen();
-                int newW = dx - bounds.x;
-                if (newW > getMinimumSize().width) {
-                    bounds.width = newW;
-                    setBounds(bounds);
-                    applyRoundedShape();
-                }
-            }
-        });
-
-        add(new JPanel()
-        {
-            {
-                setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-                add(topResizer);
-                add(topBar);
-            }
-        }, BorderLayout.NORTH);
-
-        add(bottomResizer, BorderLayout.SOUTH);
-        add(rightResizer, BorderLayout.EAST);
-        add(leftResizer, BorderLayout.WEST);
-
-        // Force the window to the top of the Z-order
-        setAlwaysOnTop(true);
-        SwingUtilities.invokeLater(this::applyRoundedShape);
-        setVisible(true);
-    }
-
-    public void addContent(Component comp, Object constraint) {
-        content.add(comp, constraint);
-        content.revalidate();
-        content.repaint();
+        enableDragging();
+        enableResizeHandles();
     }
 
     public void addContent(Component comp) {
@@ -196,37 +109,123 @@ public class AppFrame extends JFrame {
         content.revalidate();
         content.repaint();
     }
-    private void onMaximize() {
-        if (maximized) {
-            // Restore to default size
-            setBounds(100, 100, 900, 600);
-            maximize.setText("□");
-            applyRoundedShape();
-        } else {
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            GraphicsDevice gd = ge.getDefaultScreenDevice();
-            Rectangle bounds = gd.getDefaultConfiguration().getBounds();
 
-            // Leave space for your custom top bar
-            int topBarHeight = topBar.getPreferredSize().height - 10; // dynamic height
-            int margin = 0; // optional extra margin
+    public void addContent(Component comp, String constraint) {
+        content.add(comp, constraint);
+        content.revalidate();
+        content.repaint();
+    }
+    private void enableDragging() {
+        topBar.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                initialClick = e.getPoint();
+                bringToFront();
+            }
+        });
 
-            setBounds(bounds.x + margin,
-                    bounds.y + topBarHeight,
-                    bounds.width,
-                    bounds.height - topBarHeight - margin);
+        topBar.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (maximized) return;
 
-            setShape(null); // remove rounded corners when maximized
-            maximize.setText("⊙");
-        }
-        maximized = !maximized;
-        revalidate();
-        repaint();
+                int x = getX() + e.getX() - initialClick.x;
+                int y = getY() + e.getY() - initialClick.y;
+
+                setLocation(x, y);
+                repaint(); // fast, no layout
+                bringToFront();
+            }
+        });
     }
 
+    public void bringToFront() {
+        Container parent = getParent();
+        if (parent != null) {
+            parent.setComponentZOrder(this, 0);
+            parent.repaint();
+        }
+    }
 
-    private void applyRoundedShape() {
-        setShape(new RoundRectangle2D.Double(
-                0, 0, getWidth(), getHeight(), RADIUS, RADIUS));
+    private void enableResizeHandles() {
+        int margin = 6;
+
+        MouseAdapter resize = new MouseAdapter() {
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (maximized) return;
+                if (getParent() == null) return;
+
+                JComponent src = (JComponent) e.getSource();
+                Object dir = src.getClientProperty("RESIZE_DIR");
+                if (dir == null) return;
+
+                Rectangle b = getBounds();
+                Point p = SwingUtilities.convertPoint(src, e.getPoint(), getParent());
+
+                switch (dir.toString()) {
+                    case "RIGHT" -> b.width = Math.max(200, p.x - b.x);
+                    case "BOTTOM" -> b.height = Math.max(150, p.y - b.y);
+                }
+
+                setBounds(b);
+                restoreBounds = b;
+
+                repaint(); // fast
+                bringToFront();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                revalidate(); // only once
+                doLayout();
+            }
+        };
+
+        // Right resize
+        JPanel right = new JPanel();
+        right.setOpaque(false);
+        right.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+        right.setPreferredSize(new Dimension(margin, 0));
+        right.putClientProperty("RESIZE_DIR", "RIGHT");
+        right.addMouseListener(resize);
+        right.addMouseMotionListener(resize);
+        add(right, BorderLayout.EAST);
+
+        // Bottom resize
+        JPanel bottom = new JPanel();
+        bottom.setOpaque(false);
+        bottom.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+        bottom.setPreferredSize(new Dimension(0, margin));
+        bottom.putClientProperty("RESIZE_DIR", "BOTTOM");
+        bottom.addMouseListener(resize);
+        bottom.addMouseMotionListener(resize);
+        add(bottom, BorderLayout.SOUTH);
+    }
+
+    private void toggleMaximize() {
+        Container parent = getParent();
+        if (parent == null) return;
+
+        if (maximized) {
+            setBounds(restoreBounds);
+            maximize.setText("□");
+        } else {
+            restoreBounds = getBounds();
+            setBounds(
+                    maxX,
+                    maxY,
+                    parent.getWidth() - maxX - maxMarginRight,
+                    parent.getHeight() - maxY - maxMarginBottom
+            );
+            maximize.setText("⊙");
+        }
+
+        maximized = !maximized;
+
+        doLayout();
+        repaint();
+        bringToFront();
     }
 }

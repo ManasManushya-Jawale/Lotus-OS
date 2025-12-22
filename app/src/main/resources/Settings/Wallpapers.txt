@@ -1,0 +1,13 @@
+/image/Wallpapers/adwaita-l.jpg
+/image/Wallpapers/design-is-rounded-rectangles-l.jpg
+/image/Wallpapers/fold-d.jpg
+/image/Wallpapers/keys-d.jpg
+/image/Wallpapers/keys-l.jpg
+/image/Wallpapers/pills-d.jpg
+/image/Wallpapers/pills-l.jpg
+/image/Wallpapers/pixels-d.jpg
+/image/Wallpapers/pixels-l.jpg
+/image/Wallpapers/symbolic-d.png
+/image/Wallpapers/symbolic-l.png
+/image/Wallpapers/truchet-d.jpg
+/image/Wallpapers/truchet-l.jpg

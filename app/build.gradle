@@ -1,5 +1,10 @@
 plugins {
     id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+javafx {
+    modules = [ 'javafx.web', 'javafx.swing' ]
 }
 
 repositories {
@@ -7,6 +12,9 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.codehaus.janino:janino:3.1.12'
+    implementation 'org.codehaus.janino:commons-compiler:3.1.12'
+
     implementation 'org.apache.xmlgraphics:batik-swing:1.16'
     implementation 'org.apache.xmlgraphics:batik-dom:1.16'
     implementation 'org.apache.xmlgraphics:batik-transcoder:1.16'

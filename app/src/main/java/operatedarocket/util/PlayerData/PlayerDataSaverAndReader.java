@@ -9,6 +9,10 @@ public class PlayerDataSaverAndReader {
 
     private static final String SAVE_FILE = "PlayerData/playerdata.dat";
 
+    public static void init() {
+        PlayerDataSaverAndReader.save(PlayerDataSaverAndReader.load());
+    }
+
     // Save --------------------------------------------------------------
     public static void save(PlayerData player) {
         File file = resolveWritablePath(SAVE_FILE);

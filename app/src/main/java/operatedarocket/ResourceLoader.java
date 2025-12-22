@@ -80,10 +80,14 @@ public class ResourceLoader {
                     }
                 }
                 Class<?> rawClass = Class.forName(appClass);
-                if (!AppFrame.class.isAssignableFrom(rawClass)) {
-                    throw new IllegalArgumentException("Class " + appClass + " does not extend AppFrame");
+                Class<?> frameClass;
+                if (AppFrame.class.isAssignableFrom(rawClass)) {
+                    frameClass = rawClass.asSubclass(AppFrame.class);
+                } else if (Runnable.class.isAssignableFrom(rawClass)) {
+                    frameClass = rawClass.asSubclass(Runnable.class);
+                } else {
+                    throw new IllegalArgumentException();
                 }
-                Class<? extends AppFrame> frameClass = rawClass.asSubclass(AppFrame.class);
                 apps.add(new AppRejistry(name, image, frameClass, onToolbar));
             }
         }

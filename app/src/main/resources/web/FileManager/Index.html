@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Directory Listing</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin: 5px 0; }
+    a { text-decoration: none; color: #007acc; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Files in Directory</h1>
+  <ul id="file-list"></ul>
+
+  <script>
+    // Fetch file list from server
+    fetch('/files')
+      .then(response => response.json())
+      .then(files => {
+        const list = document.getElementById('file-list');
+        files.forEach(file => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = file;
+          a.textContent = file;
+          li.appendChild(a);
+          list.appendChild(li);
+        });
+      })
+      .catch(err => console.error('Error loading files:', err));
+  </script>
+</body>
+</html>

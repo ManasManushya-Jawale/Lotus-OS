@@ -6,4 +6,5 @@ import java.time.LocalDate;
 public class PlayerData implements Serializable {
     public String name;
     public LocalDate date;
+    public Boolean firstLaunch;
 }
