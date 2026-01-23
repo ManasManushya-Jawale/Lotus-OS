@@ -96,6 +96,7 @@ public class FlowerMailApplication extends AppFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 previewArea.setText(text);
+                hyperlinksArea.removeAll();
                 for (Mail.Hyprlink link : mail.hyprlinks) {
                     JButton linkButton = new JButton(link.displayText());
                     linkButton.addActionListener(f -> openLink(link));

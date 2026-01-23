@@ -12,8 +12,7 @@ import operatedarocket.ui.AppFrame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+
 public class HTMLEngineApp extends AppFrame {
 
     public final JTabbedPane tabbedPane = new JTabbedPane();

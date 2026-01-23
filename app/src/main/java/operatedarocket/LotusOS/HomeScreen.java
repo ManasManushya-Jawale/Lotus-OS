@@ -64,18 +64,6 @@ public class HomeScreen extends JPanel {
     public HomeScreen(JFrame owner) throws Exception {
         super(new BorderLayout());
 
-        loading = new JWindow();
-        loading.setLayout(new BorderLayout());
-        loading.add(
-                new JLabel("Loading the homescreen") {{
-                    setFont(LocalFonts.YOUNG20S.deriveFont(36f));
-                }},
-                BorderLayout.CENTER
-        );
-        loading.setSize(300, 100);
-        loading.setLocationRelativeTo(null);
-        loading.setVisible(true);
-
         FlowerMailBackend.init();
 
         appsOpened = new ArrayList<>();
